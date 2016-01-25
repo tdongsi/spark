@@ -9,6 +9,8 @@ object functionsA {
     println("Check addInt: " + addInt(5,6))
     println("Check addInt2: " + addInt2(5,7))
     println("Check addInt_default: " + addInt_default())
+
+    println("Check named parameters: " + addInt(b=7,a=5))
   }
 
   /*

@@ -9,11 +9,13 @@ object functionsF {
   def main(args: Array[String]): Unit = {
     val date = new Date
 
-    log(date, "message1")
+    val logwithbound = log(date, _ : String)
+
+    logwithbound("message1")
     Thread.sleep(1000)
-    log(date, "message2")
+    logwithbound("message2")
     Thread.sleep(1000)
-    log(date, "message3")
+    logwithbound("message3")
   }
 
   def log(date: Date, message: String) = {
