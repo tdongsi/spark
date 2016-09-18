@@ -47,7 +47,7 @@ import org.scalatest.junit.JUnitRunner
    * This allows tests to be written in a more readable manner:
    */
   test("one plus one is three?") {
-    assert(1 + 1 == 3) // This assertion fails! Go ahead and fix it.
+    assert(1 + 1 != 3) // This assertion fails! Go ahead and fix it.
   }
 
 
@@ -72,7 +72,7 @@ import org.scalatest.junit.JUnitRunner
    * We recommend to always use the `===` equality operator when writing tests.
    */
   test("details why one plus one is not three") {
-    assert(1 + 1 === 3) // Fix me, please!
+    assert(1 + 2 === 3) // Fix me, please!
   }
 
   /**
@@ -113,14 +113,21 @@ import org.scalatest.junit.JUnitRunner
    * however it is recommended to write an individual `test` statement for
    * every tested aspect of a method.
    */
-  test("sum of a few numbers") {
+  test("sum of a few lists") {
     assert(sum(List(1,2,0)) === 3)
+    assert(sum(List(1)) === 1)
+    assert(sum(List()) === 0)
   }
 
-  test("max of a few numbers") {
+  test("max of a few lists") {
     assert(max(List(3, 7, 2)) === 7)
+    assert(max(List(1)) == 1)
   }
 
-
+  test("max() throws an exception if the list is empty") {
+    intercept[NoSuchElementException] {
+      max(List())
+    }
+  }
 
 }
