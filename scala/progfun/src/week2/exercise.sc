@@ -41,7 +41,7 @@ object exercise {
     loop(a, 0)
   }
 
-  def sumCube2(a: Int, b: Int): Int = sum(cube)(a, b)
+  def sumCube2 = sum(cube)
 
   for (a <- 1 to 10) {
     println("Value: " + sumCube(0, a) + " " + sumCube2(0, a))
