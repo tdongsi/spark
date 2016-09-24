@@ -31,7 +31,15 @@ object exercise2 {
 
   def factorial2(n: Int) = integrate((a, b) => a*b, 1)(x => x)(1,n)
 
-  for (a <- 0 to 10) {
-    println("Value: " + factorial(a) + " " + factorial2(a))
+  def mapReduce(map: Int => Int, reduce: (Int, Int) => Int, zero: Int)(a: Int, b: Int): Int = {
+    if (a > b) zero
+    else reduce(map(a), mapReduce(map, reduce, zero)(a+1, b))
   }
+
+  def factorial3(n: Int) = mapReduce(x => x, (a, b) => a*b, 1)(1, n)
+
+  for (a <- 0 to 10) {
+    println("Value: " + factorial3(a) + " " + factorial2(a))
+  }
+
 }
