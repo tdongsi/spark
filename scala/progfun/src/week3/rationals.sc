@@ -9,24 +9,25 @@ class Rational(x: Int, y: Int) {
   def numer = x / g
   def denom = y / g
 
-  def add(that: Rational) = {
+  def + (that: Rational) = {
     new Rational(numer * that.denom + denom * that.numer, denom * that.denom)
   }
 
+  // Use name "unary_-"
   def neg() = {
     new Rational(-numer, denom)
   }
 
-  def subtract(that: Rational) = {
-    add(that.neg)
+  def - (that: Rational) = {
+    this + that.neg
   }
 
-  def less(that: Rational): Boolean = {
+  def < (that: Rational): Boolean = {
     numer * that.denom < that.numer * denom
   }
 
   def max(that: Rational): Rational = {
-    if (this.less(that)) that else this
+    if (this < that) that else this
   }
 
   override def toString() = numer + "/" + denom
@@ -44,12 +45,12 @@ val b = new Rational(2, 3)
 // Procedural way
 makeString(addRational(a, b))
 // Object-oriented way
-a.add(b).toString()
+(a + b).toString()
 
 val x = new Rational(1, 3)
 val y = new Rational(5, 7)
 val z = new Rational(3, 2)
-x.add(y).subtract(z)
-y.add(y)
-x.less(y)
-y.max(z)
+x + y - z // x.add(y).subtract(z)
+y + y // y.add(y)
+x < y // x.less(y)
+y max z
