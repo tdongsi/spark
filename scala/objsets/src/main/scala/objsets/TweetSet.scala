@@ -56,7 +56,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-    def union(that: TweetSet): TweetSet = ???
+    def union(that: TweetSet): TweetSet
   
   /**
    * Returns the tweet from this set which has the greatest retweet count.
@@ -67,7 +67,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-    def mostRetweeted: Tweet = ???
+    def mostRetweeted: Tweet
   
   /**
    * Returns a list containing all tweets of this set, sorted by retweet count
@@ -78,7 +78,18 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-    def descendingByRetweet: TweetList = ???
+    def isEmpty: Boolean
+    def descendingByRetweet: TweetList = {
+      def loop(ts: TweetSet, tl: TweetList): TweetList = {
+        if (ts.isEmpty) tl
+        else {
+          val max = ts.mostRetweeted
+          new Cons(max, loop(ts.remove(max), tl))
+        }
+      }
+
+      loop(this, Nil)
+    }
   
   /**
    * The following methods are already implemented
@@ -110,6 +121,12 @@ abstract class TweetSet {
 
 class Empty extends TweetSet {
     def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
+
+  override def union(that: TweetSet) = that
+
+  override def mostRetweeted: Tweet = null
+
+  def isEmpty = true
   
   /**
    * The following methods are already implemented
@@ -134,7 +151,24 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
       temp2
     }
   }
-  
+
+  override def union(that: TweetSet) = {
+    ((left union right) union that) incl elem
+  }
+
+  override def mostRetweeted: Tweet = {
+    val leftMax = this.left.mostRetweeted
+    val leftRet: Int = if (leftMax == null) 0 else leftMax.retweets
+
+    val rightMax = this.right.mostRetweeted
+    val rightRet: Int = if (rightMax == null) 0 else rightMax.retweets
+
+    if (elem.retweets > leftRet && elem.retweets > rightRet) elem
+    else if (leftRet > rightRet) leftMax
+    else rightMax
+  }
+
+  def isEmpty = false
     
   /**
    * The following methods are already implemented
@@ -189,15 +223,20 @@ object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
 
-    lazy val googleTweets: TweetSet = ???
-  lazy val appleTweets: TweetSet = ???
+  // Write a separate function to make it clearer
+  def mention(keywords: List[String])(tw: Tweet): Boolean = {
+    keywords.exists(s => tw.text.contains(s))
+  }
+
+  lazy val googleTweets: TweetSet = allTweets.filter(mention(google))
+  lazy val appleTweets: TweetSet = allTweets.filter(mention(apple))
   
   /**
    * A list of all tweets mentioning a keyword from either apple or google,
    * sorted by the number of retweets.
    */
-     lazy val trending: TweetList = ???
-  }
+  lazy val trending: TweetList = (googleTweets union appleTweets).descendingByRetweet
+}
 
 object Main extends App {
   // Print the trending tweets
