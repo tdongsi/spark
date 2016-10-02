@@ -56,7 +56,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-    def union(that: TweetSet): TweetSet
+    def union(that: TweetSet): TweetSet = this.filterAcc(t => !that.contains(t),that)
   
   /**
    * Returns the tweet from this set which has the greatest retweet count.
@@ -81,7 +81,7 @@ abstract class TweetSet {
     def isEmpty: Boolean
     def descendingByRetweet: TweetList = {
       def loop(ts: TweetSet, tl: TweetList): TweetList = {
-        if (ts.isEmpty) tl
+        if (ts.isEmpty || ts.mostRetweeted == null) tl
         else {
           val max = ts.mostRetweeted
           new Cons(max, loop(ts.remove(max), tl))
@@ -120,9 +120,7 @@ abstract class TweetSet {
 }
 
 class Empty extends TweetSet {
-    def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
-
-  override def union(that: TweetSet) = that
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
   override def mostRetweeted: Tweet = null
 
@@ -144,16 +142,7 @@ class Empty extends TweetSet {
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
-    val temp2 = right.filterAcc(p, left.filterAcc(p, acc))
-    if (p(elem)) {
-      temp2 incl elem
-    } else {
-      temp2
-    }
-  }
-
-  override def union(that: TweetSet) = {
-    ((left union right) union that) incl elem
+    right.filterAcc(p, left.filterAcc(p, if (p(elem)) acc.incl(elem) else acc ))
   }
 
   override def mostRetweeted: Tweet = {
