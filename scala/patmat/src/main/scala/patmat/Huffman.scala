@@ -77,7 +77,7 @@ object Huffman {
     * println("integer is  : "+ theInt)
     * }
     */
-  def times(chars: List[Char]): List[(Char, Int)] = ???
+  def times(chars: List[Char]): List[(Char, Int)] = chars.groupBy(c => c).map(e => (e._1, e._2.size)).toList
 
   /**
     * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
@@ -86,12 +86,15 @@ object Huffman {
     * head of the list should have the smallest weight), where the weight
     * of a leaf is the frequency of the character.
     */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] =
+    freqs.sortWith( (a, b) => a._2 < b._2).map{ e => Leaf(e._1, e._2)}
 
   /**
     * Checks whether the list `trees` contains only one single code tree.
     */
-  def singleton(trees: List[CodeTree]): Boolean = ???
+  def singleton(trees: List[CodeTree]): Boolean = {
+    trees.size == 1
+  }
 
   /**
     * The parameter `trees` of this function is a list of code trees ordered
@@ -105,7 +108,17 @@ object Huffman {
     * If `trees` is a list of less than two elements, that list should be returned
     * unchanged.
     */
-  def combine(trees: List[CodeTree]): List[CodeTree] = ???
+  def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
+    case Nil => Nil
+    case tree :: Nil => trees
+    case left :: right :: others => _combine(makeCodeTree(left, right), others)
+  }
+
+  def _combine(tree: Fork, trees: List[CodeTree]): List[CodeTree] = trees match {
+    case Nil => List(tree)
+    case (e : Fork) :: others => if (tree.weight <= e.weight) tree :: trees else e :: _combine(tree, others)
+    case (e : Leaf) :: others => if (tree.weight <= e.weight) tree :: trees else e :: _combine(tree, others)
+  }
 
   /**
     * This function will be called in the following way:
@@ -124,7 +137,10 @@ object Huffman {
     * the example invocation. Also define the return type of the `until` function.
     *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
     */
-  def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
+  def until(condition: List[CodeTree] => Boolean, f: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): CodeTree = {
+    if (!condition(trees)) until(condition, f)(f(trees))
+    else trees.head
+  }
 
   /**
     * This function creates a code tree which is optimal to encode the text `chars`.
