@@ -34,10 +34,18 @@ object Anagrams {
    *
    *  Note: you must use `groupBy` to implement this method!
    */
-  def wordOccurrences(w: Word): Occurrences = ???
+  def wordOccurrences(w: Word): Occurrences = {
+    for (
+      (char, str) <- w.groupBy(char => char.toLower)
+    ) yield (char, str.length)
+  }.toList.sortBy(_._1)
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = ???
+  def sentenceOccurrences(s: Sentence): Occurrences = {
+    for (
+      (char, wList) <- s.flatMap(word => wordOccurrences(word)).groupBy(_._1)
+    ) yield (char, wList.map(_._2).sum )
+  }.toList.sortBy(_._1)
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
    *  the words that have that occurrence count.
